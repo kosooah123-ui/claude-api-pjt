@@ -1,6 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
 import { randomUUID } from 'node:crypto';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { recognizeFridgeImage, generateRecipes } from './src/services/openrouter.js';
 import { parseModelJson } from './src/utils/parseModelJson.js';
 import { sanitizeRecipe } from './src/utils/sanitizeText.js';
@@ -15,11 +17,13 @@ import {
   deleteRecipe,
 } from './src/services/db.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '15mb' }));
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 app.post('/api/fridge/recognize', async (req, res) => {
   const { image } = req.body;
