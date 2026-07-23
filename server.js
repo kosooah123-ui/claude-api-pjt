@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { recognizeFridgeImage, generateRecipes } from './src/services/openrouter.js';
 import { parseModelJson } from './src/utils/parseModelJson.js';
 import { sanitizeRecipe } from './src/utils/sanitizeText.js';
+import { asyncHandler } from './src/utils/asyncHandler.js';
 import { hashPassword, verifyPassword, createSession, requireAuth } from './src/services/auth.js';
 import {
   getUserByEmail,
@@ -77,16 +78,16 @@ app.post('/api/recipe/generate', async (req, res) => {
   return res.json({ status: 'ok', recipes: recipes.map(sanitizeRecipe) });
 });
 
-app.post('/api/auth/signup', (req, res) => {
+app.post('/api/auth/signup', asyncHandler(async (req, res) => {
   const { email, password } = req.body;
   if (!email || !password) {
     return res.status(400).json({ status: 'error', error_code: 'INVALID_INPUT', message: '이메일과 비밀번호가 필요합니다.' });
   }
-  if (getUserByEmail(email)) {
+  if (await getUserByEmail(email)) {
     return res.status(409).json({ status: 'error', error_code: 'EMAIL_EXISTS', message: '이미 가입된 이메일입니다.' });
   }
 
-  const user = createUser({
+  const user = await createUser({
     id: randomUUID(),
     email,
     password_hash: hashPassword(password),
@@ -95,41 +96,41 @@ app.post('/api/auth/signup', (req, res) => {
   });
 
   return res.json({ status: 'ok', user_id: user.id });
-});
+}));
 
-app.post('/api/auth/login', (req, res) => {
+app.post('/api/auth/login', asyncHandler(async (req, res) => {
   const { email, password } = req.body;
-  const user = getUserByEmail(email);
+  const user = await getUserByEmail(email);
   if (!user || !verifyPassword(password || '', user.password_hash)) {
     return res.status(401).json({ status: 'error', error_code: 'INVALID_CREDENTIALS', message: '이메일 또는 비밀번호가 올바르지 않습니다.' });
   }
 
   const token = createSession(user.id);
   return res.json({ status: 'ok', token });
-});
+}));
 
-app.get('/api/profile', requireAuth, (req, res) => {
-  const user = getUserById(req.userId);
+app.get('/api/profile', requireAuth, asyncHandler(async (req, res) => {
+  const user = await getUserById(req.userId);
   if (!user) return res.status(404).json({ status: 'error', error_code: 'NOT_FOUND', message: '사용자를 찾을 수 없습니다.' });
   return res.json({ status: 'ok', email: user.email, preferences: user.preferences });
-});
+}));
 
-app.patch('/api/profile/preferences', requireAuth, (req, res) => {
+app.patch('/api/profile/preferences', requireAuth, asyncHandler(async (req, res) => {
   const { allergies, difficulty } = req.body;
-  const updated = updateUserPreferences(req.userId, {
+  const updated = await updateUserPreferences(req.userId, {
     ...(allergies !== undefined ? { allergies } : {}),
     ...(difficulty !== undefined ? { difficulty } : {}),
   });
   return res.json({ status: 'ok', preferences: updated.preferences });
-});
+}));
 
-app.post('/api/recipes', requireAuth, (req, res) => {
+app.post('/api/recipes', requireAuth, asyncHandler(async (req, res) => {
   const recipe = req.body;
   if (!recipe || !recipe.title) {
     return res.status(400).json({ status: 'error', error_code: 'INVALID_RECIPE', message: '레시피 데이터가 올바르지 않습니다.' });
   }
 
-  const saved = addRecipe({
+  const saved = await addRecipe({
     id: randomUUID(),
     user_id: req.userId,
     title: recipe.title,
@@ -142,14 +143,14 @@ app.post('/api/recipes', requireAuth, (req, res) => {
   });
 
   return res.json({ status: 'ok', saved_recipe_id: saved.id });
-});
+}));
 
-app.get('/api/recipes', requireAuth, (req, res) => {
-  return res.json({ status: 'ok', recipes: getRecipesByUser(req.userId) });
-});
+app.get('/api/recipes', requireAuth, asyncHandler(async (req, res) => {
+  return res.json({ status: 'ok', recipes: await getRecipesByUser(req.userId) });
+}));
 
-app.delete('/api/recipes/:id', requireAuth, (req, res) => {
-  const result = deleteRecipe(req.params.id, req.userId);
+app.delete('/api/recipes/:id', requireAuth, asyncHandler(async (req, res) => {
+  const result = await deleteRecipe(req.params.id, req.userId);
   if (result === 'not_found') {
     return res.status(404).json({ status: 'error', error_code: 'NOT_FOUND', message: '레시피를 찾을 수 없습니다.' });
   }
@@ -157,7 +158,7 @@ app.delete('/api/recipes/:id', requireAuth, (req, res) => {
     return res.status(403).json({ status: 'error', error_code: 'FORBIDDEN', message: '접근 권한이 없습니다.' });
   }
   return res.json({ status: 'ok' });
-});
+}));
 
 app.listen(PORT, () => {
   console.log(`Fridge recipe app listening on http://localhost:${PORT}`);
