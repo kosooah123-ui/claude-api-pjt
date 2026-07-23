@@ -1,0 +1,172 @@
+body {
+  font-family: system-ui, sans-serif;
+  max-width: 640px;
+  margin: 40px auto;
+  padding: 0 16px;
+  color: #222;
+}
+
+.subtitle {
+  color: #666;
+}
+
+.upload-box {
+  border: 2px dashed #bbb;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+#preview {
+  max-width: 100%;
+  max-height: 300px;
+  margin-top: 12px;
+  border-radius: 6px;
+}
+
+button {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+button:disabled {
+  background: #aaa;
+  cursor: not-allowed;
+}
+
+.status {
+  color: #b91c1c;
+  min-height: 20px;
+}
+
+#ingredientList {
+  list-style: none;
+  padding: 0;
+}
+
+#ingredientList li {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+#ingredientList input[type="text"] {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.confidence-low {
+  color: #b45309;
+  font-size: 12px;
+}
+
+.remove-btn {
+  background: #ef4444;
+  padding: 4px 10px;
+}
+
+#addIngredientBtn {
+  margin-top: 12px;
+  background: #16a34a;
+}
+
+.preferences {
+  margin: 16px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preferences input,
+.preferences select {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-left: 6px;
+}
+
+#generateRecipeBtn {
+  background: #7c3aed;
+}
+
+.recipe-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+
+.recipe-card h3 {
+  margin-top: 0;
+}
+
+.recipe-meta {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.recipe-card .missing {
+  color: #b45309;
+}
+
+#regenerateBtn {
+  background: #64748b;
+}
+
+#authSection {
+  border-bottom: 1px solid #eee;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+#authSection input {
+  padding: 6px 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  margin-right: 6px;
+}
+
+#loggedInView {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+#loggedInView[hidden] {
+  display: none;
+}
+
+#logoutBtn {
+  background: #64748b;
+}
+
+.save-recipe-btn {
+  background: #059669;
+  margin-top: 8px;
+}
+
+.saved-recipe-card {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.saved-recipe-card .saved-meta {
+  color: #666;
+  font-size: 12px;
+}
