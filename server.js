@@ -158,3 +158,5 @@ app.delete('/api/recipes/:id', requireAuth, (req, res) => {
 app.listen(PORT, () => {
   console.log(`Fridge recipe app listening on http://localhost:${PORT}`);
 });
+
+export default app;
